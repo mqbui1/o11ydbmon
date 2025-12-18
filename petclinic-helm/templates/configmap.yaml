@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: otel-javaagent
-  namespace: {{ .Values.namespace }}
-data:
-  otel-javaagent.jar: |
-    # Binary of OpenTelemetry Java agent (or mount from volume)
