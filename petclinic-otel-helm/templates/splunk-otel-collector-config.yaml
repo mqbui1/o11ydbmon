@@ -1,44 +1,54 @@
-receivers:
-  otlp:
-    protocols:
-      grpc:
-      http:
-  sqlserver:
-    collection_interval: 10s
-    username: sa
-    password: ${SQLSERVER_SA_PASSWORD}
-    server: sqlserver.petclinic.svc.cluster.local
-    port: 1433
-    events:
-      db.server.query_sample:
-        enabled: true
-      db.server.top_query:
-        enabled: true
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: splunk-otel-collector-config
+  namespace: {{ .Values.namespace }}
+data:
+  otel-collector-config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
 
-processors:
-  batch:
-  memory_limiter:
-    limit_mib: 400
-    spike_limit_mib: 200
-    check_interval: 1s
+      sqlserver:
+        collection_interval: 10s
+        username: sa
+        password: ${SQLSERVER_SA_PASSWORD}
+        server: sqlserver.{{ .Values.namespace }}.svc.cluster.local
+        port: 1433
+        events:
+          db.server.query_sample:
+            enabled: true
+          db.server.top_query:
+            enabled: true
 
-exporters:
-  otlp:
-    endpoint: ingest.{{ .Values.splunk.realm }}.signalfx.com:443
-    headers:
-      X-SF-Token: {{ .Values.splunk.accessToken }}
+    processors:
+      memory_limiter:
+        limit_mib: 400
+        spike_limit_mib: 200
+        check_interval: 1s
+      batch:
 
-service:
-  pipelines:
-    traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp]
-    metrics:
-      receivers: [otlp, sqlserver]
-      processors: [batch]
-      exporters: [otlp]
-    logs/dbmon:
-      receivers: [sqlserver]
-      processors: [batch]
-      exporters: [otlp]
+    exporters:
+      otlp:
+        endpoint: ingest.{{ .Values.splunk.realm }}.signalfx.com:443
+        headers:
+          X-SF-Token: {{ .Values.splunk.accessToken }}
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [otlp]
+
+        metrics:
+          receivers: [otlp, sqlserver]
+          processors: [batch]
+          exporters: [otlp]
+
+        logs/dbmon:
+          receivers: [sqlserver]
+          processors: [batch]
+          exporters: [otlp]
