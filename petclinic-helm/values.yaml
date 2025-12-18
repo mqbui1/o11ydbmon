@@ -1,22 +1,30 @@
 namespace: petclinic
 
 petclinic:
-  image:
-    repository: ghcr.io/spring-petclinic/spring-petclinic
-    tag: latest
-  replicas: 1
-  port: 8080
-  otelEnabled: true
+  image: "springcommunity/spring-petclinic"
+  tag: "2.7.0"
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 8080
 
-sqlserver:
-  image:
-    repository: mcr.microsoft.com/mssql/server
-    tag: 2022-latest
+mssql:
+  image: "mcr.microsoft.com/mssql/server"
+  tag: "2022-latest"
   saPassword: "YourStrong!Passw0rd"
-  port: 1433
+  database: "PetClinicDB"
+  service:
+    type: ClusterIP
+    port: 1433
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1"
 
-otel:
-  collector:
-    image: public.ecr.aws/splunk/otel-collector:latest
-    otlpPort: 4317
-    tracePort: 9411
+ingress:
+  enabled: false
+  host: petclinic.local
+  annotations: {}
