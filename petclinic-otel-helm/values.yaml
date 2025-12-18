@@ -1,7 +1,7 @@
 namespace: petclinic
 
 petclinic:
-  image: springcommunity/spring-petclinic:3.2.0
+  image: springcommunity/spring-petclinic:latest
   replicas: 1
 
 sqlserver:
