@@ -1,0 +1,22 @@
+namespace: petclinic
+
+petclinic:
+  image:
+    repository: ghcr.io/spring-petclinic/spring-petclinic
+    tag: latest
+  replicas: 1
+  port: 8080
+  otelEnabled: true
+
+sqlserver:
+  image:
+    repository: mcr.microsoft.com/mssql/server
+    tag: 2022-latest
+  saPassword: "YourStrong!Passw0rd"
+  port: 1433
+
+otel:
+  collector:
+    image: public.ecr.aws/splunk/otel-collector:latest
+    otlpPort: 4317
+    tracePort: 9411
