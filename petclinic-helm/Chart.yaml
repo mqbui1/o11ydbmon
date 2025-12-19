@@ -1,6 +1,0 @@
-apiVersion: v2
-name: petclinic
-description: Helm chart to deploy Petclinic with SQL Server
-type: application
-version: 0.1.0
-appVersion: "2.7.0"
