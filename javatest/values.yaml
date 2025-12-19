@@ -1,0 +1,23 @@
+namespace: demo
+
+app:
+  name: springboot-app
+  image: eclipse-temurin:17-jre
+  replicas: 1
+
+  # Example placeholder JAR path
+  jarPath: /app/app.jar
+
+  resources: {}
+
+sqlserver:
+  image: mcr.microsoft.com/mssql/server:2022-latest
+  saPassword: "StrongPassword!123"
+  database: petclinic
+  port: 1433
+  storageSize: 5Gi
+
+splunk:
+  realm: us0
+  accessToken: "REPLACE_ME"
+  endpoint: "https://ingest.us0.signalfx.com"

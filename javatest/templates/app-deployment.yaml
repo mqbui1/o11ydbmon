@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "chart.fullname" . }}-app
+spec:
+  replicas: {{ .Values.app.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+    spec:
+      containers:
+        - name: app
+          image: {{ .Values.app.image }}
+          command: ["java"]
+          args:
+            - "-javaagent:/otel/splunk-otel-javaagent.jar"
+            - "-jar"
+            - {{ .Values.app.jarPath }}
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: springboot-sqlserver-app
+            - name: SPLUNK_REALM
+              value: {{ .Values.splunk.realm }}
+            - name: SPLUNK_OTEL_ENDPOINT
+              value: {{ .Values.splunk.endpoint }}
+            - name: SPLUNK_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: splunk-otel-secret
+                  key: SPLUNK_ACCESS_TOKEN
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:sqlserver://{{ include "chart.fullname" . }}-sqlserver:1433;databaseName={{ .Values.sqlserver.database }}
+            - name: SPRING_DATASOURCE_USERNAME
+              value: sa
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: {{ .Values.sqlserver.saPassword }}
+          volumeMounts:
+            - name: otel-agent
+              mountPath: /otel
+      volumes:
+        - name: otel-agent
+          emptyDir: {}
